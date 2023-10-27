@@ -1,0 +1,9 @@
+
+C
+java:S1170"!Make this final field static too.(ââ½úÿÿÿÿ8òÜ«ï¶1
+
+java:S1450"]Remove the "mainController" field and declare it as a local variable in the relevant methods.(µ¾õêıÿÿÿÿ8²Õóï¶1
+t
+java:S1450"WRemove the "userRole" field and declare it as a local variable in the relevant methods.(’·£«8Ò¶Äğ¶1
+I
+java:S1068",Remove this unused "userRole" private field.(’·£«8×¶Äğ¶1

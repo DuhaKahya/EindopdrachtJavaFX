@@ -1,0 +1,13 @@
+
+}
+java:S1488ˆ"`Immediately return this expression instead of assigning it to the temporary variable "newOrder".(ç E8Å¦îé¶1
+~	java:S116"]Rename this field "FirstNameTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‡îåüÿÿÿÿ8®¯Óé¶1
+}	java:S116"\Rename this field "LastNameTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òè¬ ûÿÿÿÿ8®¯Óé¶1
+	java:S116 "`Rename this field "EmailAddressTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ·‡‹ùÿÿÿÿ8Æ¸äé¶1
+z	java:S116""_Rename this field "PhoneNumberTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òş38®¯Óé¶1
+C
+java:S1170"!Make this final field static too.(ââ½úÿÿÿÿ8®¯Óé¶1
+n
+java:S1450"QRemove the "db" field and declare it as a local variable in the relevant methods.(’ù¯ˆ8®¯Óé¶1
+C
+java:S1068"&Remove this unused "db" private field.(’ù¯ˆ8¹¯Óé¶1

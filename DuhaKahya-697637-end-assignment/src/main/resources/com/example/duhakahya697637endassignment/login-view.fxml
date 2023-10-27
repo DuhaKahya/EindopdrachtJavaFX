@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<GridPane prefHeight="350.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.LoginController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="90.0" minHeight="10.0" prefHeight="90.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="99.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="109.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="124.0" minHeight="22.0" prefHeight="78.0" />
+      <RowConstraints maxHeight="105.0" minHeight="22.0" prefHeight="64.0" />
+  </rowConstraints>
+
+    <TextField fx:id="usernameField" prefHeight="33.0" prefWidth="460.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+    <Label text="Username" textAlignment="CENTER" GridPane.rowIndex="1">
+      <font>
+         <Font size="14.0" />
+      </font></Label>
+    <Label text="Password" GridPane.rowIndex="2">
+      <font>
+         <Font size="14.0" />
+      </font></Label>
+    <Button onAction="#onLoginButtonClick" prefHeight="40.0" prefWidth="74.0" text="Login" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <font>
+         <Font size="18.0" />
+      </font>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor></Button>
+    <PasswordField fx:id="passwordField" prefHeight="33.0" prefWidth="460.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    <Label fx:id="errorLabel" text="" textFill="red" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+   <Label text="Login">
+      <font>
+         <Font size="36.0" />
+      </font>
+   </Label>
+
+
+  <padding>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+  </padding>
+</GridPane>
