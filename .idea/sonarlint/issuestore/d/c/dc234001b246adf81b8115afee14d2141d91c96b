@@ -1,0 +1,10 @@
+
+j
+java:S1192B"HDefine a constant instead of duplicating this literal "Guitars" 3 times.(‡­œîşÿÿÿÿ8¬ş›¶·1
+s	java:S117‚"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(á¡–›şÿÿÿÿ8­ş›¶·1
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ßŠÆÜûÿÿÿÿ8¿Ğ€´·1
+G	java:S106&"+Replace this use of System.out by a logger.(”š£8Õş›¶·1
+F	java:S106X"+Replace this use of System.out by a logger.(ƒšÙA8Üş›¶·1
+L	java:S106\"+Replace this use of System.out by a logger.(¦Û·şÿÿÿÿ8Üş›¶·1
+G	java:S106k"+Replace this use of System.out by a logger.(Öİí’8Şş›¶·1
+G	java:S106~"+Replace this use of System.out by a logger.(ë‡ÓØ8âş›¶·1
