@@ -1,0 +1,26 @@
+#CreateOrderButton {
+    -fx-text-fill: white;
+    -fx-background-color: #a81212;
+}
+#DashBoardButton {
+    -fx-text-fill: white;
+    -fx-background-color: #a81212;
+}
+#ProductInventoryButton {
+    -fx-text-fill: white;
+    -fx-background-color: #a81212;
+}
+#OrderHistoryButton {
+    -fx-text-fill: white;
+    -fx-background-color: #a81212;
+}
+.gridPane{
+    -fx-background-color: #8c0909;
+}
+#errorLabel{
+    -fx-text-fill: red;
+}
+#LogOutButton {
+    -fx-text-fill: white;
+    -fx-background-color: #a81212;
+}

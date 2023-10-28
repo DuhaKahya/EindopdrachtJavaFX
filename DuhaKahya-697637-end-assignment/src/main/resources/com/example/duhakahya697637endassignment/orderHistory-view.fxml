@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="850.0" styleClass="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.OrderHistoryController">
+    <children>
+        <GridPane prefHeight="600.0" prefWidth="204.0" styleClass="gridPane">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="80.0" minHeight="10.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="126.0" minHeight="10.0" prefHeight="66.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="129.0" minHeight="6.0" prefHeight="66.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="70.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="211.0" minHeight="10.0" prefHeight="195.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <Button fx:id="DashBoardButton" onAction="#onDashboardButtonClick" prefHeight="32.0" prefWidth="146.0" text="Dashboard" textAlignment="CENTER" GridPane.rowIndex="1">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="CreateOrderButton" onAction="#onCreateOrderButtonClick" prefHeight="33.0" prefWidth="145.0" text="Create order" GridPane.rowIndex="2">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="ProductInventoryButton" onAction="#onProductInventoryButtonClick" prefHeight="35.0" prefWidth="143.0" text="Product inventory" GridPane.rowIndex="3">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="OrderHistoryButton" onAction="#onOrderHistoryButtonClick" prefHeight="33.0" prefWidth="142.0" text="Order history" GridPane.rowIndex="4">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="LogOutButton" mnemonicParsing="false" onAction="#onLogoutButtonClick" prefHeight="34.0" prefWidth="63.0" text="Log out" GridPane.rowIndex="5">
+                    <GridPane.margin>
+                        <Insets left="40.0" top="100.0" />
+                    </GridPane.margin>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                </Button>
+            </children>
+        </GridPane>
+        <Label layoutX="212.0" layoutY="39.0" text="Order History">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+        <TableView fx:id="productsTableViewInventory" layoutX="212.0" layoutY="380.0" prefHeight="196.0" prefWidth="620.0">
+            <columns>
+                <TableColumn prefWidth="100.0" text="Quantity">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="quantity" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="200.0" text="Name">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="name" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="150.0" text="Category">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="category" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="150.0" text="Price">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="price" />
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+        </TableView>
+        <TableView fx:id="orderHistoryTableView" layoutX="212.0" layoutY="80.0" prefHeight="266.0" prefWidth="612.0">
+            <columns>
+                <TableColumn prefWidth="100.0" text="Date/Time">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="date" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="100.0" text="First Name">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="firstName" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="100.0" text="Last Name">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="lastName" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="180.0" text="Email">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="email" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="100.0" text="Phone number">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="phoneNumber" />
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+        </TableView>
+
+
+        <Label layoutX="212.0" layoutY="356.0" text="Ordered products">
+         <font>
+            <Font name="System Bold Italic" size="14.0" />
+         </font>
+      </Label>
+          </children>
+</AnchorPane>

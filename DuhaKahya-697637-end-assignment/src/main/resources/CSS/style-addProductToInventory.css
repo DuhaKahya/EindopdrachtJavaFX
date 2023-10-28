@@ -1,0 +1,19 @@
+#quantityErrorLabel {
+    -fx-text-fill: red;
+}
+
+#nameErrorLabel {
+    -fx-text-fill: red;
+}
+
+#categoryErrorLabel {
+    -fx-text-fill: red;
+}
+
+#priceErrorLabel {
+    -fx-text-fill: red;
+}
+
+#descriptionErrorLabel {
+    -fx-text-fill: red;
+}
