@@ -28,7 +28,6 @@ public class MainController {
     private ObservableList<Order> orders;
     // Voeg een veld userRole toe
     private String userRole;
-
     protected void initializeLabels() {
 
         roleLabel.setText("Your role is: " + userRole);
