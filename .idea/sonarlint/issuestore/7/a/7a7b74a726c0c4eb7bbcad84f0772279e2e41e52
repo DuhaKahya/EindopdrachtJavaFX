@@ -1,8 +1,0 @@
-
-{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(¤îîŸûÿÿÿÿ8È°Ñ³·1
-C
-java:S1170"!Make this final field static too.(ââ½úÿÿÿÿ8Ş°Ñ³·1
-
-java:S1450"]Remove the "mainController" field and declare it as a local variable in the relevant methods.(µ¾õêıÿÿÿÿ8 â´·1
-t
-java:S1450"WRemove the "userRole" field and declare it as a local variable in the relevant methods.(’·£«8Ş°Ñ³·1

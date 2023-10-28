@@ -1,17 +1,0 @@
-
-?
-java:S1700"Rename field "mainController"(µΎυκύÿÿÿÿ8¥²†µ·1
-{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(¤ξξϋÿÿÿÿ8«ρφ³·1
-}	java:S116"\Rename this field "CreateOrderButton" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ϊσόÿÿÿÿ8µρφ³·1
-‚	java:S116"aRename this field "ProductInventoryButton" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•Δϋϋÿÿÿÿ8µρφ³·1
-C
-java:S1170"!Make this final field static too.(ββ½ϊÿÿÿÿ8µρφ³·1
-
-java:S1450 "dRemove the "createOrderController" field and declare it as a local variable in the relevant methods.(¦ÿ¶µ8½²†µ·1
-
-java:S1450"]Remove the "mainController" field and declare it as a local variable in the relevant methods.(µΎυκύÿÿÿÿ8Ύ²†µ·1
-‚
-java:S1450!"eRemove the "orderHistoryController" field and declare it as a local variable in the relevant methods.(©Ψ8Ύ²†µ·1
-‹
-java:S1450""iRemove the "productInventoryController" field and declare it as a local variable in the relevant methods.(ΖΥªώÿÿÿÿ8Ύ²†µ·1
-k	java:S100€"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψ±Φ8ªµ·1
