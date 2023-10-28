@@ -1,0 +1,1330 @@
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java	(date 1698494640338)
+@@ -1,27 +1,160 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Data;
+ 
++import com.example.duhakahya697637endassignment.Model.Order;
++import com.example.duhakahya697637endassignment.Model.Product;
++import com.example.duhakahya697637endassignment.Model.User;
++import com.example.duhakahya697637endassignment.exceptions.SaveDataToFileException;
++import com.example.duhakahya697637endassignment.exceptions.UnknownObjectException;
++
++import java.io.*;
++import java.nio.file.FileAlreadyExistsException;
++import java.nio.file.Files;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+ public class Database {
+ 
+-    private List<Product> product = new ArrayList<>();
++    private List<Product> products;
++    private List<User> users;
++    private List<Order> orders;
++
++    private static final File DATA_FILE = new File("DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/data.dat");
++
+ 
+     public Database() {
+-        product.add(new Product(1, "Fender Stratocaster Electric Guitar", "Guitars", 1199.99, "Classic electric guitar."));
+-        product.add(new Product(10, "Yamaha Acoustic Guitar", "Guitars", 599.99, "High-quality acoustic guitar for beginners."));
+-        product.add(new Product(12, "Roland Digital Piano", "Keyboards", 1499.99, "88-key digital piano with weighted keys."));
+-        product.add(new Product(6, "Shure SM58 Microphone", "Microphones", 99.99, "Legendary dynamic microphone for vocals."));
+-        product.add(new Product(5, "AKG K240 Studio Headphones", "Headphones", 69.99, "Over-ear studio headphones with clear sound."));
+-        product.add(new Product(3, "Focusrite Scarlett 2i2 Audio Interface", "Audio Interfaces", 199.99, "USB audio interface for recording."));
+-        product.add(new Product(9, "Ibanez RG Series Electric Guitar", "Guitars", 699.99, "Versatile electric guitar for rock and metal."));
+-        product.add(new Product(18, "Fender Deluxe Reverb Amp", "Amplifiers", 899.99, "Classic tube amplifier with rich tone."));
+-        product.add(new Product(12, "Amazon Echo Dot (4th Gen)", "Smart Speakers", 49.99, "Smart speaker with Alexa voice assistant."));
++        products = new ArrayList<>();
++        users = new ArrayList<>();
++        orders = new ArrayList<>();
++        //check for data file
++        if (!DATA_FILE.exists()) {
++            loadStandardData();
++            System.out.println("Loaded standard data");
++        } else {
++            load();
++        }
++
++    }
++
++    public boolean isValidUser(String username, String password) {
++        for (User user : users) {
++            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
++                return true; // Valid user
++            }
++        }
+ 
++        return false; // User not found or invalid password
+     }
++    public void setUserRole(String username, String password, String role) {
++        for (User user : users) {
++            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
++                user.setRole(role); // Set the user's role
++            }
++        }
++    }
++
++    public String getUserRole(String username, String password) {
++        for (User user : users) {
++            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
++                return user.getRole(); // Return the user's role
++            }
++        }
++
++        return null; //
++    }
++    private void addProducts(){
++        products.add(new Product(1, "Fender Stratocaster Electric Guitar", "Guitars", 1199.99, "Classic electric guitar."));
++        products.add(new Product(10, "Yamaha Acoustic Guitar", "Guitars", 599.99, "High-quality acoustic guitar for beginners."));
++        products.add(new Product(12, "Roland Digital Piano", "Keyboards", 1499.99, "88-key digital piano with weighted keys."));
++        products.add(new Product(6, "Shure SM58 Microphone", "Microphones", 99.99, "Legendary dynamic microphone for vocals."));
++        products.add(new Product(5, "AKG K240 Studio Headphones", "Headphones", 69.99, "Over-ear studio headphones with clear sound."));
++        products.add(new Product(3, "Focusrite Scarlett 2i2 Audio Interface", "Audio Interfaces", 199.99, "USB audio interface for recording."));
++        products.add(new Product(9, "Ibanez RG Series Electric Guitar", "Guitars", 699.99, "Versatile electric guitar for rock and metal."));
++        products.add(new Product(18, "Fender Deluxe Reverb Amp", "Amplifiers", 899.99, "Classic tube amplifier with rich tone."));
++        products.add(new Product(12, "Amazon Echo Dot (4th Gen)", "Smart Speakers", 49.99, "Smart speaker with Alexa voice assistant."));
++
++    }
++    private void addUser() {
++        users.add(new User("admin", "1234", "Sales"));
++        users.add(new User("duha", "4321", "Manager"));
++
++    }
++
++    private void loadStandardData() {
++        //create standard data
++        try {
++            Files.createFile(DATA_FILE.toPath());
++        } catch (FileAlreadyExistsException ignored) {
++            System.out.println("File could not be deleted, overwriting data");
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++        System.out.println("Created new data file");
++
++        //add Data
++        addProducts();
++        addUser();
++        save();
++    }
++    public void save() {
++        System.out.println("Saving data to file");
++        //save list to file
++        try (FileOutputStream fos = new FileOutputStream(DATA_FILE, false);
++             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
++            for (Object object : products) {
++                oos.writeObject(object);
++            }
++
++        } catch (Exception e) {
++            throw new SaveDataToFileException(e);
++        }
++    }
++
++    private void load() {
++        //load list from file
++        try (ObjectInputStream ois = new ObjectInputStream(
++                new FileInputStream(DATA_FILE))) {
++            loadObjects(ois);
++            System.out.println("Loaded data from file");
++        } catch (IOException e) {
++            try {
++                Files.delete(DATA_FILE.toPath());
++            } catch (IOException Ignored) {// ignore unable to delete
++            } finally {
++                loadStandardData();
++            }
++        } catch (ClassNotFoundException e) {
++            throw new UnknownObjectException();
++        }
++    }
++
++    private void loadObjects(ObjectInputStream ois) throws IOException, ClassNotFoundException {
++        while (true) {
++            try {
++                Object object = ois.readObject();
++                if (object instanceof Order order) {//check for objects found in file
++                    orders.add(order);
++                } else if (object instanceof User user) {
++                    users.add(user);
++                }
++                else if (object instanceof Product product) {
++                    products.add(product);
++                } else {
++                    throw new UnknownObjectException();
++                }
++            } catch (EOFException e) {
++                return;
++            } catch (ClassNotFoundException e) {
++                throw new UnknownObjectException(e);
++            }
++        }
++    }
++
+ 
+     public List<Product> getProducts() {
+-        return product;
++        return products;
+     }
++    public List<Order> getOrders(){ return orders; }
++    public List<User> getUsers(){ return users; }
+ 
+ }
++
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Order.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Order.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Order.java	(date 1698448315004)
+@@ -1,8 +1,12 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Model;
++
+ 
++
++
++import java.io.Serializable;
+ import java.util.List;
+ 
+-public class Order {
++public class Order implements Serializable {
+     private String date;
+     private String firstName;
+     private String lastName;
+@@ -19,6 +23,53 @@
+         this.products = products;
+     }
+ 
++    public String getDate() {
++        return date;
++    }
++
++    public void setDate(String date) {
++        this.date = date;
++    }
++
++    public String getFirstName() {
++        return firstName;
++    }
++
++    public void setFirstName(String firstName) {
++        this.firstName = firstName;
++    }
++
++    public String getLastName() {
++        return lastName;
++    }
++
++    public void setLastName(String lastName) {
++        this.lastName = lastName;
++    }
++
++    public String getEmail() {
++        return email;
++    }
++
++    public void setEmail(String email) {
++        this.email = email;
++    }
++
++    public String getPhoneNumber() {
++        return phoneNumber;
++    }
++
++    public void setPhoneNumber(String phoneNumber) {
++        this.phoneNumber = phoneNumber;
++    }
++
++    public List<Product> getProducts() {
++        return products;
++    }
++
++    public void setProducts(List<Product> products) {
++        this.products = products;
++    }
+ 
+     public List<Product> getOrderedProducts() {
+         return products;
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/EditProductToInventoryController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/EditProductToInventoryController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/EditProductToInventoryController.java	(date 1698403137674)
+@@ -1,5 +1,6 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Model.Product;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
+ import javafx.scene.Node;
+@@ -9,7 +10,7 @@
+ 
+ import java.io.IOException;
+ 
+-public class EditProductToInventory {
++public class EditProductToInventoryController {
+     @FXML
+     private TextField quantityTextField;
+     @FXML
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/MainController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/MainController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/MainController.java	(date 1698492520037)
+@@ -1,14 +1,25 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.Order;
++import com.example.duhakahya697637endassignment.Model.User;
++import com.example.duhakahya697637endassignment.ScreenManager;
++import com.example.duhakahya697637endassignment.exceptions.UnableToUseFxmlException;
+ import javafx.collections.ObservableList;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
++import javafx.fxml.FXMLLoader;
++import javafx.fxml.Initializable;
+ import javafx.scene.Node;
++import javafx.scene.Scene;
+ import javafx.scene.control.Button;
+ import javafx.scene.control.Label;
+ import javafx.stage.Stage;
++import javafx.scene.input.MouseEvent;
++
+ 
+ import java.io.IOException;
++
+ import java.time.LocalDateTime;
+ import java.time.format.DateTimeFormatter;
+ 
+@@ -26,8 +37,9 @@
+     private Button ProductInventoryButton;
+     private ScreenManager screenManager;
+     private ObservableList<Order> orders;
+-    // Voeg een veld userRole toe
+     private String userRole;
++
++
+     protected void initializeLabels() {
+ 
+         roleLabel.setText("Your role is: " + userRole);
+@@ -38,7 +50,10 @@
+         String formattedDateTime = now.format(formatter);
+ 
+         dateTimeMain.setText("It is now: " + formattedDateTime);
++        DisableButtons();
+ 
++    }
++    protected void DisableButtons(){
+         // Disable or hide buttons based on user role
+         if ("Sales".equals(userRole)) {
+             // User with Sales role
+@@ -47,7 +62,6 @@
+             // User with Manager role
+             CreateOrderButton.setDisable(true);
+         }
+-
+     }
+ 
+     public void setOrdersList(ObservableList<Order> orders) {
+@@ -55,20 +69,8 @@
+     }
+ 
+ 
+-    @FXML
+-    protected void onLogoutButtonClick(ActionEvent e) throws IOException {
+-        screenManager = new ScreenManager("login-view.fxml", "/CSS/style-login.css");
+-        screenManager.openWindow(title);
+-
+-        screenManager.showWindow();
+-        // Close the current window
+-        closeCurrentWindow(e);
+-    }
+-
+-
+     @FXML
+     protected void onDashboardButtonClick(ActionEvent e) throws IOException {
+-
+         screenManager = new ScreenManager("main-view.fxml", "/CSS/style-main.css");
+         screenManager.openWindow(title);
+ 
+@@ -120,7 +122,18 @@
+         screenManager.showWindow();
+         closeCurrentWindow(e);
+ 
++    }
++
++    @FXML
++    protected void onLogoutButtonClick(ActionEvent e) throws IOException {
++        screenManager = new ScreenManager("login-view.fxml", "/CSS/style-login.css");
++        screenManager.openWindow(title);
++
++        screenManager.showWindow();
++        // Close the current window
++        closeCurrentWindow(e);
+     }
++
+ 
+     public void closeCurrentWindow(ActionEvent event) {
+         Node source = (Node) event.getSource();
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/CreateOrderController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/CreateOrderController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/CreateOrderController.java	(date 1698494268237)
+@@ -1,6 +1,10 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
+ 
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.Order;
++import com.example.duhakahya697637endassignment.Model.Product;
++import com.example.duhakahya697637endassignment.ScreenManager;
+ import javafx.collections.FXCollections;
+ import javafx.collections.ObservableList;
+ import javafx.event.ActionEvent;
+@@ -40,9 +44,6 @@
+         orders = FXCollections.observableArrayList(); // Initialize the list of orders
+ 
+     }
+-    public void setOrdersList(ObservableList<Order> orders) {
+-        this.orders = orders;
+-    }
+ 
+     // Voeg deze methode toe om producten aan de orderTableView toe te voegen
+     public void addProductToOrder(Product productToAdd) {
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToInventoryController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToInventoryController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToInventoryController.java	(date 1698403137681)
+@@ -1,5 +1,6 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Model.Product;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
+ import javafx.scene.Node;
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/LoginController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/LoginController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/LoginController.java	(date 1698494268251)
+@@ -1,57 +1,71 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.User;
++import com.example.duhakahya697637endassignment.ScreenManager;
++import javafx.collections.FXCollections;
++import javafx.collections.ObservableList;
+ import javafx.event.ActionEvent;
++import javafx.event.Event;
+ import javafx.fxml.FXML;
+ import javafx.scene.Node;
++import javafx.scene.Scene;
+ import javafx.scene.control.Label;
+ import javafx.scene.control.PasswordField;
+ import javafx.scene.control.TextField;
+ import javafx.stage.Stage;
++import javafx.stage.WindowEvent;
+ 
+ import java.io.IOException;
+ 
+ public class LoginController {
+ 
+     private final String title = "Wim's Music Dungeon";
++
+     @FXML
+     private PasswordField passwordField;
+     @FXML
+-    private TextField usernameField;
++    TextField usernameField;
+     @FXML
+-    private Label errorLabel;
++    Label errorLabel;
++    private Database database;
+     private String userRole;
+-    private MainController mainController;
+ 
+     @FXML
+     protected void onLoginButtonClick(ActionEvent e) throws IOException {
+         String username = usernameField.getText();
+         String password = passwordField.getText();
+ 
+-        UserDatabase userDatabase = new UserDatabase();
++        database = new Database();
+ 
+-        if (userDatabase.isValidUser(username, password)) {
++        if (database.isValidUser(username, password)) {
+ 
+-            userRole = userDatabase.getUserRole(username, password);
++            userRole = database.getUserRole(username, password);
++
++            // Store the user role in UserDatabase
++            database.setUserRole(username, password, userRole);
+ 
+             ScreenManager screenManager = new ScreenManager("main-view.fxml", "/CSS/style-main.css");
+             screenManager.openWindow(title);
+ 
+-            mainController = screenManager.getFxmlLoader().getController();
++            MainController mainController = screenManager.getFxmlLoader().getController();
+             mainController.initializeLabels();
+ 
+             screenManager.showWindow();
+ 
+             closeCurrentWindow(e);
+ 
+-
+         } else {
+             // Invalid user, display an error message
+             errorLabel.setText("Invalid username or password combination");
+         }
+ 
++
++
+     }
+ 
+-    public void closeCurrentWindow(ActionEvent event) {
++
++    protected void closeCurrentWindow(ActionEvent event) {
+         Node source = (Node) event.getSource();
+         Stage currentStage = (Stage) source.getScene().getWindow();
+         currentStage.close();
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToOrder-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.control.cell.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<GridPane prefHeight=\"500.0\" prefWidth=\"750.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.AddProductToOrderController\">\r\n  <columnConstraints>\r\n    <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n  </columnConstraints>\r\n  <rowConstraints>\r\n    <RowConstraints maxHeight=\"187.0\" minHeight=\"10.0\" prefHeight=\"44.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints maxHeight=\"286.0\" minHeight=\"10.0\" prefHeight=\"279.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints maxHeight=\"125.0\" minHeight=\"10.0\" prefHeight=\"39.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints maxHeight=\"125.0\" minHeight=\"10.0\" prefHeight=\"41.0\" vgrow=\"SOMETIMES\" />\r\n  </rowConstraints>\r\n   <children>\r\n\r\n\r\n\r\n      <Label text=\"Select product\">\r\n         <font>\r\n            <Font size=\"24.0\" />\r\n         </font>\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin>\r\n      </Label>\r\n      <Label text=\"Quantity:\" GridPane.rowIndex=\"2\">\r\n         <font>\r\n            <Font size=\"14.0\" />\r\n         </font>\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin>\r\n      </Label>\r\n      <TextField fx:id=\"quantityTextField\" prefHeight=\"25.0\" prefWidth=\"62.0\" promptText=\"Quantity\" GridPane.rowIndex=\"2\">\r\n         <GridPane.margin>\r\n            <Insets left=\"100.0\" right=\"550.0\" />\r\n         </GridPane.margin>\r\n      </TextField>\r\n      <Button fx:id=\"addToOrderButton\" mnemonicParsing=\"false\" onAction=\"#addToOrderButtonClick\" text=\"Add to order\" GridPane.rowIndex=\"3\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin>\r\n      </Button>\r\n      <Button fx:id=\"cancelButton\" mnemonicParsing=\"false\" onAction=\"#cancelButtonClick\" text=\"Cancel\" GridPane.rowIndex=\"3\">\r\n         <GridPane.margin>\r\n            <Insets left=\"100.0\" />\r\n         </GridPane.margin>\r\n      </Button>\r\n\r\n       <TableView fx:id=\"allProductsTableView\" prefHeight=\"200.0\" prefWidth=\"400.0\" GridPane.rowIndex=\"1\">\r\n           <columns>\r\n               <TableColumn prefWidth=\"75.0\" text=\"Quantity\">\r\n                   <cellValueFactory>\r\n                       <PropertyValueFactory property=\"quantity\" />\r\n                   </cellValueFactory>\r\n               </TableColumn>\r\n               <TableColumn prefWidth=\"200.0\" text=\"Name\">\r\n                   <cellValueFactory>\r\n                       <PropertyValueFactory property=\"name\" />\r\n                   </cellValueFactory>\r\n               </TableColumn>\r\n               <TableColumn prefWidth=\"150.0\" text=\"Category\">\r\n                   <cellValueFactory>\r\n                       <PropertyValueFactory property=\"category\" />\r\n                   </cellValueFactory>\r\n               </TableColumn>\r\n               <TableColumn prefWidth=\"75.0\" text=\"Price\">\r\n                   <cellValueFactory>\r\n                       <PropertyValueFactory property=\"price\" />\r\n                   </cellValueFactory>\r\n               </TableColumn>\r\n               <TableColumn prefWidth=\"200.0\" text=\"Description\">\r\n                   <cellValueFactory>\r\n                       <PropertyValueFactory property=\"description\" />\r\n                   </cellValueFactory>\r\n               </TableColumn>\r\n           </columns>\r\n           <GridPane.margin>\r\n               <Insets left=\"10.0\" right=\"20.0\" />\r\n           </GridPane.margin>\r\n       </TableView>\r\n      <Label fx:id=\"errorLabel\" GridPane.rowIndex=\"2\">\r\n         <GridPane.margin>\r\n            <Insets left=\"250.0\" />\r\n         </GridPane.margin>\r\n      </Label>\r\n\r\n   </children>\r\n</GridPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToOrder-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToOrder-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToOrder-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToOrder-view.fxml	(date 1698492520040)
+@@ -6,7 +6,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<GridPane prefHeight="500.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.AddProductToOrderController">
++<GridPane prefHeight="500.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.AddProductToOrderController">
+   <columnConstraints>
+     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+   </columnConstraints>
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<GridPane prefHeight=\"350.0\" prefWidth=\"400.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.LoginController\">\r\n  <columnConstraints>\r\n    <ColumnConstraints hgrow=\"NEVER\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n    <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n  </columnConstraints>\r\n  <rowConstraints>\r\n    <RowConstraints maxHeight=\"90.0\" minHeight=\"10.0\" prefHeight=\"90.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints maxHeight=\"99.0\" minHeight=\"10.0\" prefHeight=\"52.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints maxHeight=\"109.0\" minHeight=\"10.0\" prefHeight=\"64.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints maxHeight=\"124.0\" minHeight=\"22.0\" prefHeight=\"78.0\" />\r\n      <RowConstraints maxHeight=\"105.0\" minHeight=\"22.0\" prefHeight=\"64.0\" />\r\n  </rowConstraints>\r\n\r\n    <TextField fx:id=\"usernameField\" prefHeight=\"33.0\" prefWidth=\"460.0\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"1\" />\r\n\r\n    <Label text=\"Username\" textAlignment=\"CENTER\" GridPane.rowIndex=\"1\">\r\n      <font>\r\n         <Font size=\"14.0\" />\r\n      </font></Label>\r\n    <Label text=\"Password\" GridPane.rowIndex=\"2\">\r\n      <font>\r\n         <Font size=\"14.0\" />\r\n      </font></Label>\r\n    <Button onAction=\"#onLoginButtonClick\" prefHeight=\"40.0\" prefWidth=\"74.0\" text=\"Login\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"3\">\r\n      <font>\r\n         <Font size=\"18.0\" />\r\n      </font>\r\n      <cursor>\r\n         <Cursor fx:constant=\"HAND\" />\r\n      </cursor></Button>\r\n    <PasswordField fx:id=\"passwordField\" prefHeight=\"33.0\" prefWidth=\"460.0\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"2\" />\r\n    <Label fx:id=\"errorLabel\" text=\"\" textFill=\"red\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"4\" />\r\n   <Label text=\"Login\">\r\n      <font>\r\n         <Font size=\"36.0\" />\r\n      </font>\r\n   </Label>\r\n\r\n\r\n  <padding>\r\n    <Insets bottom=\"20.0\" left=\"20.0\" right=\"20.0\" top=\"20.0\" />\r\n  </padding>\r\n</GridPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml	(date 1698492520048)
+@@ -6,7 +6,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<GridPane prefHeight="350.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.LoginController">
++<GridPane prefHeight="350.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.LoginController">
+   <columnConstraints>
+     <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+Index: .idea/sonarlint/securityhotspotstore/index.pb
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\n�\u0001\njDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java\u0012,9\\2\\92cebebb71f92f03d14410aa1e728aa667f1660d\n�\u0001\nkDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java\u0012,6\\3\\63b5b94e08b0cae3dc432ec5970dd8cbcbba8826\n�\u0001\nqDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java\u0012,5\\1\\51b899580f28437417038c4e8fbbc75e0c8a3e83\n�\u0001\nvDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java\u0012,0\\9\\090230bfca90de81539b624ae922abfad6e714c3\n�\u0001\nrDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java\u0012,7\\c\\7c7f998c3841827301aa335008d361596b4b2d19\n�\u0001\nhDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java\u0012,e\\0\\e0326df46ec6109a5ca2f8b569f56a3b01cc8a34\n�\u0001\nlDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginApplication.java\u0012,a\\e\\aee97932fb97e49039dfd093b912538fa59bbc9c\n�\u0001\niDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java\u0012,d\\c\\dc6ee334d13e0ee159b05a8491febea179b6184a\n�\u0001\ncDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java\u0012,b\\a\\ba3337ddf80f90714a5943ecb81437c2962d8f2b\n�\u0001\ndDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java\u0012,8\\9\\89f01765d6e248c106bd9ab9c3be8a62c1b2718f\n�\u0001\naDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java\u0012,f\\2\\f20410f9a9882343573c26ecce016ea43534990d\n�\u0001\n{DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java\u0012,9\\c\\9c198185b03350bf7a276dafeed417bf147b427e\n�\u0001\nwDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java\u0012,b\\3\\b36c2ec975e0d71459a3d2c42c62dd11971f2bb4\n�\u0001\nrDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java\u0012,f\\a\\fa7f634c890a8636c05623a9fc79deba5f56b5cf\nX\n(DuhaKahya-697637-end-assignment/mvnw.cmd\u0012,6\\7\\67526f1260257d7e4dcb099a3c48cc426b553e80\nT\n$DuhaKahya-697637-end-assignment/mvnw\u0012,f\\e\\fe3c9c74124e70de49aca514136837a39a0b766d\ns\nCDuhaKahya-697637-end-assignment/DuhaKahya-697637-end-assignment.iml\u0012,a\\b\\abc8183cafe38a36ec9472098d394723f6ec805e\nu\nEDuhaKahya-697637-end-assignment/.mvn/wrapper/maven-wrapper.properties\u0012,a\\a\\aad44895b4a456645289f8878b3801b6f5068e1b\nW\n'DuhaKahya-697637-end-assignment/pom.xml\u0012,6\\d\\6de7afb62027822291570e977a25784dbab3ca58\nW\n'DuhaKahya-697637-end-assignment/Read.md\u0012,8\\4\\8429e889e799280c20aced0c58b6aefe1d6ba13f
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/sonarlint/securityhotspotstore/index.pb b/.idea/sonarlint/securityhotspotstore/index.pb
+--- a/.idea/sonarlint/securityhotspotstore/index.pb	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/.idea/sonarlint/securityhotspotstore/index.pb	(date 1698493797393)
+@@ -1,32 +1,8 @@
+ 
+-�
+-jDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java,9\2\92cebebb71f92f03d14410aa1e728aa667f1660d
+-�
+-kDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java,6\3\63b5b94e08b0cae3dc432ec5970dd8cbcbba8826
+-�
+-qDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java,5\1\51b899580f28437417038c4e8fbbc75e0c8a3e83
+-�
+-vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java,0\9\090230bfca90de81539b624ae922abfad6e714c3
+-�
+-rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java,7\c\7c7f998c3841827301aa335008d361596b4b2d19
+-�
+-hDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java,e\0\e0326df46ec6109a5ca2f8b569f56a3b01cc8a34
+ �
+ lDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginApplication.java,a\e\aee97932fb97e49039dfd093b912538fa59bbc9c
+ �
+ iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java,d\c\dc6ee334d13e0ee159b05a8491febea179b6184a
+-�
+-cDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java,b\a\ba3337ddf80f90714a5943ecb81437c2962d8f2b
+-�
+-dDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java,8\9\89f01765d6e248c106bd9ab9c3be8a62c1b2718f
+-�
+-aDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java,f\2\f20410f9a9882343573c26ecce016ea43534990d
+-�
+-{DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java,9\c\9c198185b03350bf7a276dafeed417bf147b427e
+-�
+-wDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java,b\3\b36c2ec975e0d71459a3d2c42c62dd11971f2bb4
+-�
+-rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java,f\a\fa7f634c890a8636c05623a9fc79deba5f56b5cf
+ X
+ (DuhaKahya-697637-end-assignment/mvnw.cmd,6\7\67526f1260257d7e4dcb099a3c48cc426b553e80
+ T
+@@ -38,4 +14,42 @@
+ W
+ 'DuhaKahya-697637-end-assignment/pom.xml,6\d\6de7afb62027822291570e977a25784dbab3ca58
+ W
+-'DuhaKahya-697637-end-assignment/Read.md,8\4\8429e889e799280c20aced0c58b6aefe1d6ba13f
+\ No newline at end of file
++'DuhaKahya-697637-end-assignment/Read.md,8\4\8429e889e799280c20aced0c58b6aefe1d6ba13f
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/ProductInventoryController.java,e\4\e44940d4a772cf25d2daf78ae69adf1c1d8f7207
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToInventoryController.java,f\3\f366b935e5ebaafeb24cf3545b7d34f89132c4f4
++�
++uDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/MainController.java,6\1\6118b5123773a86f67c00a1dd28fe07cecb4e0af
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/EditProductToInventoryController.java,c\8\c8c13086163be0351e2eef33a5c435e7311119a6
++�
++iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java,d\c\dc234001b246adf81b8115afee14d2141d91c96b
++�
++vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/LoginController.java,7\a\7a7b74a726c0c4eb7bbcad84f0772279e2e41e52
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToOrderController.java,7\7\7775be41230b5dace3f4870ded8a7c55907178df
++�
++}DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/OrderHistoryController.java,6\4\6480ae45e8a2e9e98ced74efcae57279f38fd3f2
++�
++|DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/CreateOrderController.java,f\b\fb223127a5569aabcbc8c6eb2d07e316bc69ed39
++�
++iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Product.java,9\8\984cfab323803a9850a07908d48481ea644ba3ed
++�
++gDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Order.java,5\2\529c4b651cf1130b4da3bf61c6d14da729428302
++�
++}DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java,7\6\7688effc2caf8a3ba131c052b4e34093997d1109
++�
++DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java,8\8\88913374514cfa694a909e8895ffa848df3c7679
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java,1\9\196b9c78120dcd4a04a91efe7e6e064c34188545
++�
++~DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java,4\1\4160b37b5ba6a664fd04c6654934c50168c2fe38
++�
++uDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java,4\2\42d2c8eec4d36ab3a0fcea85a63ace48ea6e0061
++�
++fDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java,a\e\ae792ab356cea49935558bf25407cb4553b64d14
++�
++rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java,7\c\7c7f998c3841827301aa335008d361596b4b2d19
++�
++vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java,0\9\090230bfca90de81539b624ae922abfad6e714c3
+\ No newline at end of file
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<GridPane  prefHeight=\"400.0\" prefWidth=\"750.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.EditProductToInventory\">\r\n    <columnConstraints>\r\n        <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"242.0\" minWidth=\"10.0\" prefWidth=\"182.0\" />\r\n        <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"375.0\" minWidth=\"10.0\" prefWidth=\"321.0\" />\r\n        <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"247.0\" minWidth=\"10.0\" prefWidth=\"247.0\" />\r\n    </columnConstraints>\r\n    <rowConstraints>\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n        <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n    </rowConstraints>\r\n    <children>\r\n        <Label prefHeight=\"27.0\" prefWidth=\"178.0\" text=\"Edit Product\">\r\n            <font>\r\n                <Font name=\"System Bold Italic\" size=\"18.0\" />\r\n            </font>\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label text=\"Quantity:\" GridPane.rowIndex=\"1\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin></Label>\r\n        <Label text=\"Name:\" GridPane.rowIndex=\"2\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin></Label>\r\n        <Label text=\"Category:\" GridPane.rowIndex=\"3\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin></Label>\r\n        <Label text=\"Price:\" GridPane.rowIndex=\"4\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin></Label>\r\n        <Label text=\"Description:\" GridPane.rowIndex=\"5\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin></Label>\r\n        <TextField fx:id=\"quantityTextField\" promptText=\"Quantity\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"1\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" right=\"10.0\" />\r\n            </GridPane.margin></TextField>\r\n        <TextField fx:id=\"nameTextField\" promptText=\"Name\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"2\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" right=\"10.0\" />\r\n            </GridPane.margin></TextField>\r\n        <TextField fx:id=\"categoryTextField\" promptText=\"Category\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"3\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" right=\"10.0\" />\r\n            </GridPane.margin></TextField>\r\n        <TextField fx:id=\"priceTextField\" promptText=\"Price\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"4\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" right=\"10.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <TextField fx:id=\"descriptionTextField\" prefWidth=\"285.0\" promptText=\"Description\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"5\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" right=\"10.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <Button mnemonicParsing=\"false\" onAction=\"#onEditButtonClick\" prefHeight=\"28.0\" prefWidth=\"45.0\" text=\"Edit\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"6\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Button>\r\n\r\n        <Label fx:id=\"quantityErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"1\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label fx:id=\"nameErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"2\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label fx:id=\"categoryErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"3\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label fx:id=\"priceErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"4\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label fx:id=\"descriptionErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"5\">\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n    </children>\r\n</GridPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml	(date 1698492520052)
+@@ -5,7 +5,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<GridPane  prefHeight="400.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.EditProductToInventory">
++<GridPane  prefHeight="400.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.EditProductToInventoryController">
+     <columnConstraints>
+         <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="182.0" />
+         <ColumnConstraints hgrow="SOMETIMES" maxWidth="375.0" minWidth="10.0" prefWidth="321.0" />
+Index: .idea/sonarlint/issuestore/index.pb
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\n�\u0001\nhDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java\u0012,e\\0\\e0326df46ec6109a5ca2f8b569f56a3b01cc8a34\n�\u0001\nrDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java\u0012,7\\c\\7c7f998c3841827301aa335008d361596b4b2d19\n�\u0001\nvDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java\u0012,0\\9\\090230bfca90de81539b624ae922abfad6e714c3\n�\u0001\nqDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java\u0012,5\\1\\51b899580f28437417038c4e8fbbc75e0c8a3e83\n�\u0001\nkDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java\u0012,6\\3\\63b5b94e08b0cae3dc432ec5970dd8cbcbba8826\n�\u0001\njDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java\u0012,9\\2\\92cebebb71f92f03d14410aa1e728aa667f1660d\n�\u0001\nlDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginApplication.java\u0012,a\\e\\aee97932fb97e49039dfd093b912538fa59bbc9c\n�\u0001\niDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java\u0012,d\\c\\dc6ee334d13e0ee159b05a8491febea179b6184a\n�\u0001\ncDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java\u0012,b\\a\\ba3337ddf80f90714a5943ecb81437c2962d8f2b\n�\u0001\ndDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java\u0012,8\\9\\89f01765d6e248c106bd9ab9c3be8a62c1b2718f\n�\u0001\naDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java\u0012,f\\2\\f20410f9a9882343573c26ecce016ea43534990d\n�\u0001\n{DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java\u0012,9\\c\\9c198185b03350bf7a276dafeed417bf147b427e\n�\u0001\nwDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java\u0012,b\\3\\b36c2ec975e0d71459a3d2c42c62dd11971f2bb4\n�\u0001\nrDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java\u0012,f\\a\\fa7f634c890a8636c05623a9fc79deba5f56b5cf\nX\n(DuhaKahya-697637-end-assignment/mvnw.cmd\u0012,6\\7\\67526f1260257d7e4dcb099a3c48cc426b553e80\nT\n$DuhaKahya-697637-end-assignment/mvnw\u0012,f\\e\\fe3c9c74124e70de49aca514136837a39a0b766d\ns\nCDuhaKahya-697637-end-assignment/DuhaKahya-697637-end-assignment.iml\u0012,a\\b\\abc8183cafe38a36ec9472098d394723f6ec805e\nu\nEDuhaKahya-697637-end-assignment/.mvn/wrapper/maven-wrapper.properties\u0012,a\\a\\aad44895b4a456645289f8878b3801b6f5068e1b\nW\n'DuhaKahya-697637-end-assignment/pom.xml\u0012,6\\d\\6de7afb62027822291570e977a25784dbab3ca58\nW\n'DuhaKahya-697637-end-assignment/Read.md\u0012,8\\4\\8429e889e799280c20aced0c58b6aefe1d6ba13f
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/sonarlint/issuestore/index.pb b/.idea/sonarlint/issuestore/index.pb
+--- a/.idea/sonarlint/issuestore/index.pb	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/.idea/sonarlint/issuestore/index.pb	(date 1698493797381)
+@@ -1,32 +1,8 @@
+ 
+-�
+-hDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java,e\0\e0326df46ec6109a5ca2f8b569f56a3b01cc8a34
+-�
+-rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java,7\c\7c7f998c3841827301aa335008d361596b4b2d19
+-�
+-vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java,0\9\090230bfca90de81539b624ae922abfad6e714c3
+-�
+-qDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/CreateOrderController.java,5\1\51b899580f28437417038c4e8fbbc75e0c8a3e83
+-�
+-kDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginController.java,6\3\63b5b94e08b0cae3dc432ec5970dd8cbcbba8826
+-�
+-jDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/MainController.java,9\2\92cebebb71f92f03d14410aa1e728aa667f1660d
+ �
+ lDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/LoginApplication.java,a\e\aee97932fb97e49039dfd093b912538fa59bbc9c
+ �
+ iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java,d\c\dc6ee334d13e0ee159b05a8491febea179b6184a
+-�
+-cDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java,b\a\ba3337ddf80f90714a5943ecb81437c2962d8f2b
+-�
+-dDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Database.java,8\9\89f01765d6e248c106bd9ab9c3be8a62c1b2718f
+-�
+-aDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Order.java,f\2\f20410f9a9882343573c26ecce016ea43534990d
+-�
+-{DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToInventoryController.java,9\c\9c198185b03350bf7a276dafeed417bf147b427e
+-�
+-wDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java,b\3\b36c2ec975e0d71459a3d2c42c62dd11971f2bb4
+-�
+-rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/EditProductToInventory.java,f\a\fa7f634c890a8636c05623a9fc79deba5f56b5cf
+ X
+ (DuhaKahya-697637-end-assignment/mvnw.cmd,6\7\67526f1260257d7e4dcb099a3c48cc426b553e80
+ T
+@@ -38,4 +14,42 @@
+ W
+ 'DuhaKahya-697637-end-assignment/pom.xml,6\d\6de7afb62027822291570e977a25784dbab3ca58
+ W
+-'DuhaKahya-697637-end-assignment/Read.md,8\4\8429e889e799280c20aced0c58b6aefe1d6ba13f
+\ No newline at end of file
++'DuhaKahya-697637-end-assignment/Read.md,8\4\8429e889e799280c20aced0c58b6aefe1d6ba13f
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/ProductInventoryController.java,e\4\e44940d4a772cf25d2daf78ae69adf1c1d8f7207
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToInventoryController.java,f\3\f366b935e5ebaafeb24cf3545b7d34f89132c4f4
++�
++uDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/MainController.java,6\1\6118b5123773a86f67c00a1dd28fe07cecb4e0af
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/EditProductToInventoryController.java,c\8\c8c13086163be0351e2eef33a5c435e7311119a6
++�
++vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/LoginController.java,7\a\7a7b74a726c0c4eb7bbcad84f0772279e2e41e52
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToOrderController.java,7\7\7775be41230b5dace3f4870ded8a7c55907178df
++�
++iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java,d\c\dc234001b246adf81b8115afee14d2141d91c96b
++�
++}DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/OrderHistoryController.java,6\4\6480ae45e8a2e9e98ced74efcae57279f38fd3f2
++�
++|DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/CreateOrderController.java,f\b\fb223127a5569aabcbc8c6eb2d07e316bc69ed39
++�
++iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Product.java,9\8\984cfab323803a9850a07908d48481ea644ba3ed
++�
++gDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Order.java,5\2\529c4b651cf1130b4da3bf61c6d14da729428302
++�
++}DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java,7\6\7688effc2caf8a3ba131c052b4e34093997d1109
++�
++DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java,8\8\88913374514cfa694a909e8895ffa848df3c7679
++�
++�DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java,1\9\196b9c78120dcd4a04a91efe7e6e064c34188545
++�
++~DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java,4\1\4160b37b5ba6a664fd04c6654934c50168c2fe38
++�
++uDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java,4\2\42d2c8eec4d36ab3a0fcea85a63ace48ea6e0061
++�
++fDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java,a\e\ae792ab356cea49935558bf25407cb4553b64d14
++�
++rDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java,7\c\7c7f998c3841827301aa335008d361596b4b2d19
++�
++vDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java,0\9\090230bfca90de81539b624ae922abfad6e714c3
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1698402514726)
++++ b/.idea/vcs.xml	(date 1698402514726)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToInventory-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<GridPane  prefHeight=\"400.0\" prefWidth=\"750.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.AddProductToInventoryController\">\r\n  <columnConstraints>\r\n    <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"242.0\" minWidth=\"10.0\" prefWidth=\"182.0\" />\r\n    <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"375.0\" minWidth=\"10.0\" prefWidth=\"321.0\" />\r\n      <ColumnConstraints hgrow=\"SOMETIMES\" maxWidth=\"247.0\" minWidth=\"10.0\" prefWidth=\"247.0\" />\r\n  </columnConstraints>\r\n  <rowConstraints>\r\n    <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n    <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n      <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />\r\n  </rowConstraints>\r\n   <children>\r\n      <Label prefHeight=\"27.0\" prefWidth=\"178.0\" text=\"Add Product\">\r\n         <font>\r\n            <Font name=\"System Bold Italic\" size=\"18.0\" />\r\n         </font>\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin>\r\n      </Label>\r\n      <Label text=\"Quantity:\" GridPane.rowIndex=\"1\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n      <Label text=\"Name:\" GridPane.rowIndex=\"2\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n      <Label text=\"Category:\" GridPane.rowIndex=\"3\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n      <Label text=\"Price:\" GridPane.rowIndex=\"4\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n      <Label text=\"Description:\" GridPane.rowIndex=\"5\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n      <TextField fx:id=\"quantityTextField\" promptText=\"Quantity\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"1\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"10.0\" />\r\n         </GridPane.margin></TextField>\r\n      <TextField fx:id=\"nameTextField\" promptText=\"Name\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"2\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"10.0\" />\r\n         </GridPane.margin></TextField>\r\n      <TextField fx:id=\"categoryTextField\" promptText=\"Category\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"3\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"10.0\" />\r\n         </GridPane.margin></TextField>\r\n      <TextField fx:id=\"priceTextField\" promptText=\"Price\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"4\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"10.0\" />\r\n         </GridPane.margin>\r\n      </TextField>\r\n      <TextField fx:id=\"descriptionTextField\" prefWidth=\"285.0\" promptText=\"Description\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"5\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"10.0\" />\r\n         </GridPane.margin>\r\n      </TextField>\r\n      <Button mnemonicParsing=\"false\" onAction=\"#onConfirmButtonClick\" text=\"Confirm\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"6\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin>\r\n      </Button>\r\n\r\n      <Label fx:id=\"quantityErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"1\">\r\n       <GridPane.margin>\r\n           <Insets left=\"10.0\" />\r\n       </GridPane.margin>\r\n      </Label>\r\n      <Label fx:id=\"nameErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"2\">\r\n          <GridPane.margin>\r\n              <Insets left=\"10.0\" />\r\n          </GridPane.margin>\r\n      </Label>\r\n      <Label fx:id=\"categoryErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"3\">\r\n          <GridPane.margin>\r\n              <Insets left=\"10.0\" />\r\n          </GridPane.margin>\r\n      </Label>\r\n      <Label fx:id=\"priceErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"4\">\r\n          <GridPane.margin>\r\n              <Insets left=\"10.0\" />\r\n          </GridPane.margin>\r\n      </Label>\r\n      <Label fx:id=\"descriptionErrorLabel\" text=\"\" GridPane.columnIndex=\"2\" GridPane.rowIndex=\"5\">\r\n          <GridPane.margin>\r\n              <Insets left=\"10.0\" />\r\n          </GridPane.margin>\r\n      </Label>\r\n   </children>\r\n</GridPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToInventory-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToInventory-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToInventory-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/addProductToInventory-view.fxml	(date 1698492520061)
+@@ -5,7 +5,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<GridPane  prefHeight="400.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.AddProductToInventoryController">
++<GridPane  prefHeight="400.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.AddProductToInventoryController">
+   <columnConstraints>
+     <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="182.0" />
+     <ColumnConstraints hgrow="SOMETIMES" maxWidth="375.0" minWidth="10.0" prefWidth="321.0" />
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/UserDatabase.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java	(date 1698448448671)
+@@ -1,59 +1,38 @@
+-package com.example.duhakahya697637endassignment;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-public class UserDatabase {
+-    private final List<User> users;
+-
+-    public UserDatabase() {
+-        // Initialize the database with some sample users
+-        users = new ArrayList<>();
+-        users.add(new User("admin", "1234", "Sales"));
+-        users.add(new User("duha", "4321", "Manager"));
+-    }
++package com.example.duhakahya697637endassignment.Model;
+ 
+-    public boolean isValidUser(String username, String password) {
+-        for (User user : users) {
+-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+-                return true; // Valid user
+-            }
+-        }
+-        return false; // User not found or invalid password
+-    }
++import java.io.Serializable;
+ 
+-    public String getUserRole(String username, String password) {
+-        for (User user : users) {
+-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+-                return user.getRole(); // Return the user's role
+-            }
+-        }
+-        return null; // User not found or invalid password
+-    }
+ 
+-
+-    // Define a User class to store username and password
+-    private static class User {
+-        private final String username;
+-        private final String password;
+-        private final String role;
++public class User implements Serializable {
++    private String currentUserRole;
++    private final String username;
++    private final String password;
++    private String role;
++
+ 
+-        public User(String username, String password, String role) {
+-            this.username = username;
+-            this.password = password;
+-            this.role = role;
+-        }
++    public User(String username, String password, String role) {
++        this.username = username;
++        this.password = password;
++        this.role = role;
++    }
+ 
+-        public String getUsername() {
+-            return username;
+-        }
++
++    public String getUsername() {
++        return username;
++    }
+ 
+-        public String getPassword() {
+-            return password;
+-        }
++    public String getPassword() {
++        return password;
++    }
+ 
+-        public String getRole() {
+-            return role;
+-        }
++    public String getRole() {
++        return role;
++    }
++
++    public void setRole(String role) {
++        this.role = role;
+     }
++
++
++
+ }
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Product.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Product.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Product.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/Product.java	(date 1698448314999)
+@@ -1,6 +1,8 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Model;
+ 
+-public class Product {
++import java.io.Serializable;
++
++public class Product implements Serializable {
+     private int quantity;
+     private String name;
+     private String category;
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java
+new file mode 100644
+--- /dev/null	(date 1698447036428)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToDeleteFileException.java	(date 1698447036428)
+@@ -0,0 +1,20 @@
++package com.example.duhakahya697637endassignment.exceptions;
++
++public class UnableToDeleteFileException extends RuntimeException {
++
++    public UnableToDeleteFileException() {
++        super("Unable to delete file");
++    }
++
++    public UnableToDeleteFileException(String message) {
++        super(message);
++    }
++
++    public UnableToDeleteFileException(String message, Throwable cause) {
++        super(message, cause);
++    }
++
++    public UnableToDeleteFileException(Throwable cause) {
++        super(cause);
++    }
++}
+\ No newline at end of file
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java
+new file mode 100644
+--- /dev/null	(date 1698447036408)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnknownObjectException.java	(date 1698447036408)
+@@ -0,0 +1,21 @@
++package com.example.duhakahya697637endassignment.exceptions;
++
++public class UnknownObjectException extends RuntimeException {
++
++    public UnknownObjectException() {
++        super("Unknown object type");
++    }
++
++    public UnknownObjectException(String message) {
++        super(message);
++    }
++
++    public UnknownObjectException(String message, Throwable cause) {
++        super(message, cause);
++    }
++
++    public UnknownObjectException(Throwable cause) {
++        super(cause);
++    }
++}
++
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java
+new file mode 100644
+--- /dev/null	(date 1698447036388)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/UnableToUseFxmlException.java	(date 1698447036388)
+@@ -0,0 +1,18 @@
++package com.example.duhakahya697637endassignment.exceptions;
++
++public class UnableToUseFxmlException extends RuntimeException {
++
++    public UnableToUseFxmlException(String message) {
++        super(message);
++    }
++
++    public UnableToUseFxmlException(String message, Throwable cause) {
++        super(message, cause);
++    }
++
++    public UnableToUseFxmlException(Throwable cause) {
++        super(cause);
++    }
++
++}
++
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java
+new file mode 100644
+--- /dev/null	(date 1698447036382)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/exceptions/SaveDataToFileException.java	(date 1698447036382)
+@@ -0,0 +1,20 @@
++package com.example.duhakahya697637endassignment.exceptions;
++
++public class SaveDataToFileException extends RuntimeException {
++    public SaveDataToFileException() {
++        super("Error while saving data to file");
++    }
++
++    public SaveDataToFileException(String message) {
++        super(message);
++    }
++
++    public SaveDataToFileException(String message, Throwable cause) {
++        super(message, cause);
++    }
++
++    public SaveDataToFileException(Throwable cause) {
++        super(cause);
++    }
++}
++
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/OrderHistoryController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/OrderHistoryController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/OrderHistoryController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/OrderHistoryController.java	(date 1698421914251)
+@@ -1,5 +1,8 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Model.Order;
++import com.example.duhakahya697637endassignment.Model.Product;
++import com.example.duhakahya697637endassignment.ScreenManager;
+ import javafx.collections.ObservableList;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
+@@ -13,7 +16,6 @@
+ 
+ public class OrderHistoryController {
+     private final String title = "Wim's Music Dungeon";
+-
+     @FXML
+     private TableView<Order> orderHistoryTableView;
+     @FXML
+@@ -31,7 +33,6 @@
+         if (event.getClickCount() == 1) {
+             // Zorg ervoor dat een enkele klik op een rij is gebeurd
+ 
+-
+             // Haal de geselecteerde order op
+             Order selectedOrder = orderHistoryTableView.getSelectionModel().getSelectedItem();
+ 
+@@ -115,7 +116,7 @@
+         // Close the current window
+         closeCurrentWindow(e);
+     }
+-    public void closeCurrentWindow(ActionEvent event) {
++    protected void closeCurrentWindow(ActionEvent event) {
+         Node source = (Node) event.getSource();
+         Stage currentStage = (Stage) source.getScene().getWindow();
+         currentStage.close();
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<AnchorPane styleClass=\"anchorPane\" prefHeight=\"600.0\" prefWidth=\"850.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.MainController\">\r\n   <children>\r\n       <GridPane styleClass=\"gridPane\" prefHeight=\"600.0\" prefWidth=\"204.0\">\r\n           <columnConstraints>\r\n               <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n           </columnConstraints>\r\n           <rowConstraints>\r\n               <RowConstraints maxHeight=\"81.0\" minHeight=\"10.0\" prefHeight=\"75.0\" vgrow=\"SOMETIMES\" />\r\n               <RowConstraints maxHeight=\"80.0\" minHeight=\"10.0\" prefHeight=\"80.0\" vgrow=\"SOMETIMES\" />\r\n               <RowConstraints maxHeight=\"126.0\" minHeight=\"10.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n               <RowConstraints maxHeight=\"129.0\" minHeight=\"6.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n               <RowConstraints maxHeight=\"194.0\" minHeight=\"10.0\" prefHeight=\"70.0\" vgrow=\"SOMETIMES\" />\r\n               <RowConstraints maxHeight=\"211.0\" minHeight=\"10.0\" prefHeight=\"195.0\" vgrow=\"SOMETIMES\" />\r\n           </rowConstraints>\r\n           <children>\r\n\r\n               <Button fx:id=\"DashBoardButton\" onAction=\"#onDashboardButtonClick\" prefHeight=\"32.0\" prefWidth=\"146.0\" text=\"Dashboard\" textAlignment=\"CENTER\" GridPane.rowIndex=\"1\">\r\n                   <cursor>\r\n                       <Cursor fx:constant=\"HAND\" />\r\n                   </cursor>\r\n                   <GridPane.margin>\r\n                       <Insets left=\"30.0\" />\r\n                   </GridPane.margin>\r\n               </Button>\r\n               <Button fx:id=\"CreateOrderButton\" onAction=\"#onCreateOrderButtonClick\" prefHeight=\"33.0\" prefWidth=\"145.0\" text=\"Create order\" GridPane.rowIndex=\"2\">\r\n                   <cursor>\r\n                       <Cursor fx:constant=\"HAND\" />\r\n                   </cursor>\r\n                   <GridPane.margin>\r\n                       <Insets left=\"30.0\" />\r\n                   </GridPane.margin>\r\n               </Button>\r\n               <Button fx:id=\"ProductInventoryButton\" onAction=\"#onProductInventoryButtonClick\" prefHeight=\"35.0\" prefWidth=\"143.0\" text=\"Product inventory\" GridPane.rowIndex=\"3\">\r\n                   <cursor>\r\n                       <Cursor fx:constant=\"HAND\" />\r\n                   </cursor>\r\n                   <GridPane.margin>\r\n                       <Insets left=\"30.0\" />\r\n                   </GridPane.margin>\r\n               </Button>\r\n               <Button fx:id=\"OrderHistoryButton\" onAction=\"#onOrderHistoryButtonClick\" prefHeight=\"33.0\" prefWidth=\"142.0\" text=\"Order history\" GridPane.rowIndex=\"4\">\r\n                   <cursor>\r\n                       <Cursor fx:constant=\"HAND\" />\r\n                   </cursor>\r\n                   <GridPane.margin>\r\n                       <Insets left=\"30.0\" />\r\n                   </GridPane.margin>\r\n               </Button>\r\n            <Button fx:id=\"LogOutButton\" mnemonicParsing=\"false\" onAction=\"#onLogoutButtonClick\" prefHeight=\"34.0\" prefWidth=\"63.0\" text=\"Log out\" GridPane.rowIndex=\"5\">\r\n               <GridPane.margin>\r\n                  <Insets left=\"40.0\" top=\"100.0\" />\r\n               </GridPane.margin>\r\n               <cursor>\r\n                  <Cursor fx:constant=\"HAND\" />\r\n               </cursor>\r\n            </Button>\r\n           </children>\r\n       </GridPane>\r\n\r\n      <Label alignment=\"TOP_LEFT\" layoutX=\"219.0\" layoutY=\"35.0\" text=\"Welcome Wim Wiltenburg!\" GridPane.columnIndex=\"1\">\r\n         <font>\r\n            <Font name=\"System Bold\" size=\"16.0\" />\r\n         </font>\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" top=\"-20.0\" />\r\n         </GridPane.margin>\r\n      </Label>\r\n       <Label fx:id=\"roleLabel\" layoutX=\"219.0\" layoutY=\"74.0\" prefHeight=\"17.0\" prefWidth=\"202.0\" GridPane.columnIndex=\"1\">\r\n           <GridPane.margin>\r\n               <Insets left=\"10.0\" top=\"30.0\" />\r\n           </GridPane.margin>\r\n       </Label>\r\n       <Label fx:id=\"dateTimeMain\" layoutX=\"219.0\" layoutY=\"101.0\" prefHeight=\"17.0\" prefWidth=\"228.0\" GridPane.columnIndex=\"1\">\r\n           <GridPane.margin>\r\n               <Insets left=\"10.0\" top=\"70.0\" />\r\n           </GridPane.margin>\r\n       </Label>\r\n   </children>\r\n</AnchorPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml	(date 1698492520070)
+@@ -6,7 +6,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<AnchorPane styleClass="anchorPane" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.MainController">
++<AnchorPane styleClass="anchorPane" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.MainController">
+    <children>
+        <GridPane styleClass="gridPane" prefHeight="600.0" prefWidth="204.0">
+            <columnConstraints>
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/ProductInventoryController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/ProductInventoryController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ProductInventoryController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/ProductInventoryController.java	(date 1698421914257)
+@@ -1,5 +1,9 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.*;
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.Order;
++import com.example.duhakahya697637endassignment.Model.Product;
+ import javafx.beans.binding.Bindings;
+ import javafx.collections.FXCollections;
+ import javafx.collections.ObservableList;
+@@ -65,7 +69,7 @@
+             ScreenManager screenManager = new ScreenManager("editProductToInventory-view.fxml", "/CSS/style-editProductToInventory.css");
+             screenManager.openWindow("Edit Product");
+ 
+-            EditProductToInventory editProductToInventoryController = screenManager.getFxmlLoader().getController();
++            EditProductToInventoryController editProductToInventoryController = screenManager.getFxmlLoader().getController();
+             editProductToInventoryController.editProductToInventoryController(this);
+             editProductToInventoryController.setProductForEditing(selectedProduct);  // Pass the selected product
+ 
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java
+new file mode 100644
+--- /dev/null	(date 1698491651514)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/BaseController.java	(date 1698491651514)
+@@ -0,0 +1,42 @@
++package com.example.duhakahya697637endassignment.Controller;
++
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.LoginApplication;
++import com.example.duhakahya697637endassignment.Model.User;
++import com.example.duhakahya697637endassignment.exceptions.UnableToUseFxmlException;
++import javafx.fxml.FXMLLoader;
++import javafx.scene.Scene;
++import javafx.stage.Stage;
++
++import java.io.IOException;
++
++public class BaseController {
++    protected final User user;
++    protected final Database db;
++    public BaseController() {
++        this.user = null;
++        this.db = null;
++    }
++    public BaseController(User user, Database db) {
++        this.user = user;
++        this.db = db;
++    }
++
++    protected Scene getScene(String fxml, BaseController controller) {
++        FXMLLoader fxmlLoader = new FXMLLoader(LoginApplication.class.getResource(fxml));
++
++        fxmlLoader.setController(controller);
++        try {
++            return new Scene(fxmlLoader.load());
++        } catch (IOException e) {
++            throw new UnableToUseFxmlException(e);
++        }
++
++    }
++    protected void showNewScene(Stage stage, Scene scene) {
++        //show main window
++        stage.setTitle("Wim's Music Dungeon");
++        stage.setScene(scene);
++        stage.show();
++    }
++}
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.control.cell.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<AnchorPane prefHeight=\"600.0\" prefWidth=\"850.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.CreateOrderController\">\r\n    <children>\r\n        <GridPane prefHeight=\"600.0\" prefWidth=\"204.0\" styleClass=\"gridPane\">\r\n            <columnConstraints>\r\n                <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n            </columnConstraints>\r\n            <rowConstraints>\r\n                <RowConstraints maxHeight=\"81.0\" minHeight=\"10.0\" prefHeight=\"75.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"80.0\" minHeight=\"10.0\" prefHeight=\"80.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"126.0\" minHeight=\"10.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"129.0\" minHeight=\"6.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"194.0\" minHeight=\"10.0\" prefHeight=\"70.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"211.0\" minHeight=\"10.0\" prefHeight=\"195.0\" vgrow=\"SOMETIMES\" />\r\n            </rowConstraints>\r\n            <children>\r\n\r\n                <Button fx:id=\"DashBoardButton\" onAction=\"#onDashboardButtonClick\" prefHeight=\"32.0\" prefWidth=\"146.0\" text=\"Dashboard\" textAlignment=\"CENTER\" GridPane.rowIndex=\"1\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"CreateOrderButton\" onAction=\"#onCreateOrderButtonClick\" prefHeight=\"33.0\" prefWidth=\"145.0\" text=\"Create order\" GridPane.rowIndex=\"2\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"ProductInventoryButton\" onAction=\"#onProductInventoryButtonClick\" prefHeight=\"35.0\" prefWidth=\"143.0\" text=\"Product inventory\" GridPane.rowIndex=\"3\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"OrderHistoryButton\" onAction=\"#onOrderHistoryButtonClick\" prefHeight=\"33.0\" prefWidth=\"142.0\" text=\"Order history\" GridPane.rowIndex=\"4\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n            </children>\r\n            <Button fx:id=\"LogOutButton\" mnemonicParsing=\"false\" onAction=\"#onLogoutButtonClick\" prefHeight=\"34.0\" prefWidth=\"63.0\" text=\"Log out\" GridPane.rowIndex=\"5\">\r\n                <GridPane.margin>\r\n                    <Insets left=\"40.0\" top=\"100.0\" />\r\n                </GridPane.margin>\r\n                <cursor>\r\n                    <Cursor fx:constant=\"HAND\" />\r\n                </cursor>\r\n            </Button>\r\n        </GridPane>\r\n\r\n        <Label layoutX=\"223.0\" layoutY=\"61.0\" text=\"Customer information\" GridPane.columnIndex=\"1\">\r\n            <font>\r\n                <Font size=\"14.0\" />\r\n            </font>\r\n            <opaqueInsets>\r\n                <Insets />\r\n            </opaqueInsets>\r\n            <GridPane.margin>\r\n                <Insets left=\"10.0\" top=\"50.0\" />\r\n            </GridPane.margin>\r\n        </Label>\r\n        <Label layoutX=\"223.0\" layoutY=\"114.0\" text=\"*First name:\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"1\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n        <TextField fx:id=\"FirstNameTextField\" layoutX=\"351.0\" layoutY=\"110.0\" prefHeight=\"25.0\" prefWidth=\"200.0\" promptText=\"First name\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"1\">\r\n            <GridPane.margin>\r\n                <Insets left=\"100.0\" right=\"80.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <TextField fx:id=\"LastNameTextField\" layoutX=\"351.0\" layoutY=\"146.0\" prefHeight=\"25.0\" prefWidth=\"200.0\" promptText=\"Last name\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"2\">\r\n            <GridPane.margin>\r\n                <Insets left=\"100.0\" right=\"80.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <TextField fx:id=\"EmailAddressTextField\" layoutX=\"351.0\" layoutY=\"183.0\" prefHeight=\"25.0\" prefWidth=\"200.0\" promptText=\"E-mail address\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"3\">\r\n            <GridPane.margin>\r\n                <Insets left=\"100.0\" right=\"80.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <TextField fx:id=\"PhoneNumberTextField\" layoutX=\"351.0\" layoutY=\"220.0\" prefHeight=\"25.0\" prefWidth=\"200.0\" promptText=\"Phone number\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"4\">\r\n            <GridPane.margin>\r\n                <Insets left=\"100.0\" right=\"80.0\" />\r\n            </GridPane.margin>\r\n        </TextField>\r\n        <Label layoutX=\"224.0\" layoutY=\"150.0\" text=\"*Last name:\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"2\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n        <Label layoutX=\"223.0\" layoutY=\"187.0\" text=\"*E-mail address:\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"3\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n        <Label layoutX=\"223.0\" layoutY=\"224.0\" text=\"*Phone number:\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"4\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Label>\r\n        <Label layoutX=\"226.0\" layoutY=\"273.0\" text=\"Products\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"5\">\r\n            <GridPane.margin>\r\n                <Insets bottom=\"220.0\" left=\"10.0\" />\r\n            </GridPane.margin>\r\n            <font>\r\n                <Font name=\"System Bold Italic\" size=\"18.0\" />\r\n            </font>\r\n        </Label>\r\n\r\n        <Button layoutX=\"211.0\" layoutY=\"561.0\" mnemonicParsing=\"false\" onAction=\"#addProductButton\" text=\"Add product\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"6\">\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" />\r\n         </GridPane.margin></Button>\r\n        <Button layoutX=\"320.0\" layoutY=\"561.0\" mnemonicParsing=\"false\" onAction=\"#deleteProductButton\" text=\"Delete product\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"6\">\r\n            <GridPane.margin>\r\n                <Insets left=\"100.0\" />\r\n            </GridPane.margin>\r\n        </Button>\r\n        <Button layoutX=\"442.0\" layoutY=\"561.0\" mnemonicParsing=\"false\" onAction=\"#createOrderButton\" text=\"Create order\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"6\">\r\n            <GridPane.margin>\r\n                <Insets left=\"210.0\" />\r\n            </GridPane.margin>\r\n        </Button>\r\n      <TableView fx:id=\"orderTableView\" layoutX=\"220.0\" layoutY=\"310.0\" prefHeight=\"224.0\" prefWidth=\"580.0\" GridPane.columnIndex=\"1\" GridPane.rowIndex=\"5\">\r\n          <columns>\r\n              <TableColumn prefWidth=\"75.0\" text=\"Quantity\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"quantity\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"200.0\" text=\"Name\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"name\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"150.0\" text=\"Category\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"category\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"100.0\" text=\"Price\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"price\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n          </columns>\r\n         <GridPane.margin>\r\n            <Insets left=\"10.0\" right=\"20.0\" top=\"30.0\" />\r\n         </GridPane.margin>\r\n      </TableView>\r\n\r\n              <Label alignment=\"TOP_LEFT\" layoutX=\"223.0\" layoutY=\"28.0\" text=\"Create Order\">\r\n            <font>\r\n                <Font name=\"System Bold\" size=\"16.0\" />\r\n            </font>\r\n        </Label>\r\n      <Label fx:id=\"errorLabel\" layoutX=\"551.0\" layoutY=\"560.0\" prefHeight=\"27.0\" prefWidth=\"253.0\">\r\n         <font>\r\n            <Font size=\"15.0\" />\r\n         </font>\r\n      </Label>\r\n\r\n        \r\n\r\n\r\n    </children>\r\n\r\n</AnchorPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml	(date 1698492520044)
+@@ -7,7 +7,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<AnchorPane prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.CreateOrderController">
++<AnchorPane prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.CreateOrderController">
+     <children>
+         <GridPane prefHeight="600.0" prefWidth="204.0" styleClass="gridPane">
+             <columnConstraints>
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.duhakahya697637endassignment;\r\n\r\nimport javafx.fxml.FXMLLoader;\r\nimport javafx.scene.Scene;\r\nimport javafx.stage.Stage;\r\n\r\nimport java.io.IOException;\r\n\r\npublic class ScreenManager {\r\n    private final String fxmlPath;\r\n    private final String cssPath;\r\n    private Stage stage;\r\n    private FXMLLoader fxmlLoader;\r\n\r\n    public ScreenManager(String fxmlPath, String cssPath) {\r\n        this.fxmlPath = fxmlPath;\r\n        this.cssPath = cssPath;\r\n    }\r\n\r\n    public void openWindow(String title) throws IOException {\r\n        fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath));\r\n        Scene scene = new Scene(fxmlLoader.load());\r\n        scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());\r\n        stage = new Stage();\r\n        stage.setTitle(title);\r\n        stage.setScene(scene);\r\n    }\r\n\r\n    public void showWindow() {\r\n        stage.show();\r\n    }\r\n\r\n    public FXMLLoader getFxmlLoader() {\r\n        return fxmlLoader;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/ScreenManager.java	(date 1698451312731)
+@@ -1,7 +1,11 @@
+ package com.example.duhakahya697637endassignment;
+ 
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.User;
++import javafx.fxml.FXML;
+ import javafx.fxml.FXMLLoader;
+ import javafx.scene.Scene;
++import javafx.scene.control.Button;
+ import javafx.stage.Stage;
+ 
+ import java.io.IOException;
+Index: DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToOrderController.java
+rename from DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java
+rename to DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToOrderController.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/AddProductToOrderController.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Controller/AddProductToOrderController.java	(date 1698403137735)
+@@ -1,18 +1,17 @@
+-package com.example.duhakahya697637endassignment;
++package com.example.duhakahya697637endassignment.Controller;
+ 
++import com.example.duhakahya697637endassignment.Data.Database;
++import com.example.duhakahya697637endassignment.Model.Product;
+ import javafx.collections.FXCollections;
+ import javafx.collections.ObservableList;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
+ import javafx.scene.Node;
+-import javafx.scene.control.Alert;
+ import javafx.scene.control.Label;
+ import javafx.scene.control.TableView;
+ import javafx.scene.control.TextField;
+ import javafx.stage.Stage;
+ 
+-import java.io.IOException;
+-
+ public class AddProductToOrderController {
+     @FXML
+     public TableView<Product> allProductsTableView;
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<?import javafx.scene.control.cell.PropertyValueFactory?>\r\n<AnchorPane styleClass=\"anchorPane\" prefHeight=\"600.0\" prefWidth=\"850.0\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.ProductInventoryController\">\r\n   <children>\r\n      <GridPane styleClass=\"gridPane\" prefHeight=\"600.0\" prefWidth=\"204.0\">\r\n        <columnConstraints>\r\n          <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n        </columnConstraints>\r\n        <rowConstraints>\r\n          <RowConstraints maxHeight=\"81.0\" minHeight=\"10.0\" prefHeight=\"75.0\" vgrow=\"SOMETIMES\" />\r\n          <RowConstraints maxHeight=\"80.0\" minHeight=\"10.0\" prefHeight=\"80.0\" vgrow=\"SOMETIMES\" />\r\n          <RowConstraints maxHeight=\"126.0\" minHeight=\"10.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n            <RowConstraints maxHeight=\"129.0\" minHeight=\"6.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n            <RowConstraints maxHeight=\"194.0\" minHeight=\"10.0\" prefHeight=\"70.0\" vgrow=\"SOMETIMES\" />\r\n            <RowConstraints maxHeight=\"211.0\" minHeight=\"10.0\" prefHeight=\"195.0\" vgrow=\"SOMETIMES\" />\r\n        </rowConstraints>\r\n         <children>\r\n      \r\n              <Button fx:id=\"DashBoardButton\" onAction=\"#onDashboardButtonClick\" prefHeight=\"32.0\" prefWidth=\"146.0\" text=\"Dashboard\" textAlignment=\"CENTER\" GridPane.rowIndex=\"1\">\r\n                  <cursor>\r\n                      <Cursor fx:constant=\"HAND\" />\r\n                  </cursor>\r\n               <GridPane.margin>\r\n                  <Insets left=\"30.0\" />\r\n               </GridPane.margin>\r\n              </Button>\r\n              <Button fx:id=\"CreateOrderButton\" onAction=\"#onCreateOrderButtonClick\" prefHeight=\"33.0\" prefWidth=\"145.0\" text=\"Create order\" GridPane.rowIndex=\"2\">\r\n                  <cursor>\r\n                      <Cursor fx:constant=\"HAND\" />\r\n                  </cursor>\r\n               <GridPane.margin>\r\n                  <Insets left=\"30.0\" />\r\n               </GridPane.margin>\r\n              </Button>\r\n              <Button fx:id=\"ProductInventoryButton\" onAction=\"#onProductInventoryButtonClick\" prefHeight=\"35.0\" prefWidth=\"143.0\" text=\"Product inventory\" GridPane.rowIndex=\"3\">\r\n                  <cursor>\r\n                      <Cursor fx:constant=\"HAND\" />\r\n                  </cursor>\r\n               <GridPane.margin>\r\n                  <Insets left=\"30.0\" />\r\n               </GridPane.margin>\r\n              </Button>\r\n              <Button fx:id=\"OrderHistoryButton\" onAction=\"#onOrderHistoryButtonClick\" prefHeight=\"33.0\" prefWidth=\"142.0\" text=\"Order history\" GridPane.rowIndex=\"4\">\r\n                  <cursor>\r\n                      <Cursor fx:constant=\"HAND\" />\r\n                  </cursor>\r\n               <GridPane.margin>\r\n                  <Insets left=\"30.0\" />\r\n               </GridPane.margin>\r\n              </Button>\r\n             <Button fx:id=\"LogOutButton\" mnemonicParsing=\"false\" onAction=\"#onLogoutButtonClick\" prefHeight=\"34.0\" prefWidth=\"63.0\" text=\"Log out\" GridPane.rowIndex=\"5\">\r\n                 <GridPane.margin>\r\n                     <Insets left=\"40.0\" top=\"100.0\" />\r\n                 </GridPane.margin>\r\n                 <cursor>\r\n                     <Cursor fx:constant=\"HAND\" />\r\n                 </cursor>\r\n             </Button>\r\n         </children>\r\n      </GridPane>\r\n      <Label layoutX=\"212.0\" layoutY=\"30.0\" text=\"Product inventory\">\r\n         <font>\r\n            <Font name=\"System Bold\" size=\"18.0\" />\r\n         </font>\r\n      </Label>\r\n      <TableView fx:id=\"productsTableViewInventory\" layoutX=\"212.0\" layoutY=\"69.0\" prefHeight=\"459.0\" prefWidth=\"620.0\">\r\n          <columns>\r\n              <TableColumn prefWidth=\"75.0\" text=\"Quantity\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"quantity\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"200.0\" text=\"Name\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"name\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"100.0\" text=\"Category\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"category\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"80.0\" text=\"Price\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"price\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n              <TableColumn prefWidth=\"150.0\" text=\"Description\">\r\n                  <cellValueFactory>\r\n                      <PropertyValueFactory property=\"description\" />\r\n                  </cellValueFactory>\r\n              </TableColumn>\r\n          </columns>\r\n      </TableView>\r\n      <Button fx:id=\"addProductButton\" onAction=\"#onAddProductButtonClick\" layoutX=\"212.0\" layoutY=\"540.0\" mnemonicParsing=\"false\" text=\"Add product\" />\r\n      <Button fx:id=\"editProductButton\" onAction=\"#onEditProductButtonClick\" layoutX=\"307.0\" layoutY=\"540.0\" mnemonicParsing=\"false\" text=\"Edit product\" />\r\n      <Button fx:id=\"deleteProductButton\" onAction=\"#onDeleteProductButtonClick\" layoutX=\"399.0\" layoutY=\"540.0\" mnemonicParsing=\"false\" text=\"Delecte product\" />\r\n   </children>\r\n</AnchorPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml	(date 1698492520057)
+@@ -7,7 +7,7 @@
+ <?import javafx.scene.text.*?>
+ 
+ <?import javafx.scene.control.cell.PropertyValueFactory?>
+-<AnchorPane styleClass="anchorPane" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.ProductInventoryController">
++<AnchorPane styleClass="anchorPane" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.ProductInventoryController">
+    <children>
+       <GridPane styleClass="gridPane" prefHeight="600.0" prefWidth="204.0">
+         <columnConstraints>
+Index: DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n\r\n<?import javafx.geometry.*?>\r\n<?import javafx.scene.*?>\r\n<?import javafx.scene.control.*?>\r\n<?import javafx.scene.control.cell.*?>\r\n<?import javafx.scene.layout.*?>\r\n<?import javafx.scene.text.*?>\r\n\r\n<AnchorPane prefHeight=\"600.0\" prefWidth=\"850.0\" styleClass=\"anchorPane\" xmlns=\"http://javafx.com/javafx/17.0.2-ea\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.duhakahya697637endassignment.OrderHistoryController\">\r\n    <children>\r\n        <GridPane prefHeight=\"600.0\" prefWidth=\"204.0\" styleClass=\"gridPane\">\r\n            <columnConstraints>\r\n                <ColumnConstraints hgrow=\"SOMETIMES\" minWidth=\"10.0\" prefWidth=\"100.0\" />\r\n            </columnConstraints>\r\n            <rowConstraints>\r\n                <RowConstraints maxHeight=\"81.0\" minHeight=\"10.0\" prefHeight=\"75.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"80.0\" minHeight=\"10.0\" prefHeight=\"80.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"126.0\" minHeight=\"10.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"129.0\" minHeight=\"6.0\" prefHeight=\"66.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"194.0\" minHeight=\"10.0\" prefHeight=\"70.0\" vgrow=\"SOMETIMES\" />\r\n                <RowConstraints maxHeight=\"211.0\" minHeight=\"10.0\" prefHeight=\"195.0\" vgrow=\"SOMETIMES\" />\r\n            </rowConstraints>\r\n            <children>\r\n\r\n                <Button fx:id=\"DashBoardButton\" onAction=\"#onDashboardButtonClick\" prefHeight=\"32.0\" prefWidth=\"146.0\" text=\"Dashboard\" textAlignment=\"CENTER\" GridPane.rowIndex=\"1\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"CreateOrderButton\" onAction=\"#onCreateOrderButtonClick\" prefHeight=\"33.0\" prefWidth=\"145.0\" text=\"Create order\" GridPane.rowIndex=\"2\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"ProductInventoryButton\" onAction=\"#onProductInventoryButtonClick\" prefHeight=\"35.0\" prefWidth=\"143.0\" text=\"Product inventory\" GridPane.rowIndex=\"3\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"OrderHistoryButton\" onAction=\"#onOrderHistoryButtonClick\" prefHeight=\"33.0\" prefWidth=\"142.0\" text=\"Order history\" GridPane.rowIndex=\"4\">\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                    <GridPane.margin>\r\n                        <Insets left=\"30.0\" />\r\n                    </GridPane.margin>\r\n                </Button>\r\n                <Button fx:id=\"LogOutButton\" mnemonicParsing=\"false\" onAction=\"#onLogoutButtonClick\" prefHeight=\"34.0\" prefWidth=\"63.0\" text=\"Log out\" GridPane.rowIndex=\"5\">\r\n                    <GridPane.margin>\r\n                        <Insets left=\"40.0\" top=\"100.0\" />\r\n                    </GridPane.margin>\r\n                    <cursor>\r\n                        <Cursor fx:constant=\"HAND\" />\r\n                    </cursor>\r\n                </Button>\r\n            </children>\r\n        </GridPane>\r\n        <Label layoutX=\"212.0\" layoutY=\"39.0\" text=\"Order History\">\r\n            <font>\r\n                <Font name=\"System Bold\" size=\"24.0\" />\r\n            </font>\r\n        </Label>\r\n        <TableView fx:id=\"productsTableViewInventory\" layoutX=\"212.0\" layoutY=\"380.0\" prefHeight=\"196.0\" prefWidth=\"620.0\">\r\n            <columns>\r\n                <TableColumn prefWidth=\"100.0\" text=\"Quantity\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"quantity\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"200.0\" text=\"Name\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"name\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"150.0\" text=\"Category\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"category\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"150.0\" text=\"Price\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"price\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n            </columns>\r\n        </TableView>\r\n        <TableView fx:id=\"orderHistoryTableView\" layoutX=\"212.0\" layoutY=\"80.0\" prefHeight=\"266.0\" prefWidth=\"612.0\">\r\n            <columns>\r\n                <TableColumn prefWidth=\"100.0\" text=\"Date/Time\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"date\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"100.0\" text=\"First Name\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"firstName\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"100.0\" text=\"Last Name\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"lastName\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"180.0\" text=\"Email\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"email\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n                <TableColumn prefWidth=\"100.0\" text=\"Phone number\">\r\n                    <cellValueFactory>\r\n                        <PropertyValueFactory property=\"phoneNumber\" />\r\n                    </cellValueFactory>\r\n                </TableColumn>\r\n            </columns>\r\n        </TableView>\r\n\r\n\r\n        <Label layoutX=\"212.0\" layoutY=\"356.0\" text=\"Ordered products\">\r\n         <font>\r\n            <Font name=\"System Bold Italic\" size=\"14.0\" />\r\n         </font>\r\n      </Label>\r\n          </children>\r\n</AnchorPane>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml
+--- a/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml	(date 1698492520080)
+@@ -7,7 +7,7 @@
+ <?import javafx.scene.layout.*?>
+ <?import javafx.scene.text.*?>
+ 
+-<AnchorPane prefHeight="600.0" prefWidth="850.0" styleClass="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.OrderHistoryController">
++<AnchorPane prefHeight="600.0" prefWidth="850.0" styleClass="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.OrderHistoryController">
+     <children>
+         <GridPane prefHeight="600.0" prefWidth="204.0" styleClass="gridPane">
+             <columnConstraints>
+Index: DuhaKahya-697637-end-assignment/src/main/java/module-info.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>module com.example.duhakahya697637endassignment {\r\n    requires javafx.controls;\r\n    requires javafx.fxml;\r\n    requires java.desktop;\r\n\r\n\r\n    opens com.example.duhakahya697637endassignment to javafx.fxml;\r\n    exports com.example.duhakahya697637endassignment;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DuhaKahya-697637-end-assignment/src/main/java/module-info.java b/DuhaKahya-697637-end-assignment/src/main/java/module-info.java
+--- a/DuhaKahya-697637-end-assignment/src/main/java/module-info.java	(revision 7856f44d49c4206879c2e0fbe137ae703683eb01)
++++ b/DuhaKahya-697637-end-assignment/src/main/java/module-info.java	(date 1698447036374)
+@@ -6,4 +6,12 @@
+ 
+     opens com.example.duhakahya697637endassignment to javafx.fxml;
+     exports com.example.duhakahya697637endassignment;
++    exports com.example.duhakahya697637endassignment.Controller;
++    opens com.example.duhakahya697637endassignment.Controller to javafx.fxml;
++    exports com.example.duhakahya697637endassignment.Model;
++    opens com.example.duhakahya697637endassignment.Model to javafx.fxml;
++    exports com.example.duhakahya697637endassignment.Data;
++    opens com.example.duhakahya697637endassignment.Data to javafx.fxml;
++    exports com.example.duhakahya697637endassignment.exceptions;
++    opens com.example.duhakahya697637endassignment.exceptions to javafx.fxml;
+ }
+\ No newline at end of file
