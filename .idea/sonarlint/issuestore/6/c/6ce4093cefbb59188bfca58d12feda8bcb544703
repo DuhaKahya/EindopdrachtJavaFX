@@ -1,0 +1,15 @@
+
+<
+java:S1170"!Make this final field static too.(ââ½úÿÿÿÿ
+
+java:S1128"fRemove this unused import 'com.example.duhakahya697637endassignment.Controller.CreateOrderController'.(‚Ú×µüÿÿÿÿ
+{
+java:S1128"`Remove this unused import 'com.example.duhakahya697637endassignment.Controller.LoginController'.(Ììî§ùÿÿÿÿ
+}
+java:S1128"gRemove this unused import 'com.example.duhakahya697637endassignment.Controller.OrderHistoryController'.(Ìì´Ò
+†
+java:S1128"kRemove this unused import 'com.example.duhakahya697637endassignment.Controller.ProductInventoryController'.(Õòµÿþÿÿÿÿ
+n
+java:S1128"SRemove this unused import 'com.example.duhakahya697637endassignment.Data.Database'.(þ›Îàüÿÿÿÿ
+g
+java:S1128"QRemove this unused import 'com.example.duhakahya697637endassignment.Model.Order'.(­„ÕÐ

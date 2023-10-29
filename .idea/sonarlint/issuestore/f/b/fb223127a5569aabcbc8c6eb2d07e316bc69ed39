@@ -1,0 +1,27 @@
+
+}
+java:S1488™"`Immediately return this expression instead of assigning it to the temporary variable "newOrder".(η E8Ττα·1
+A
+java:S17002"$Rename field "createOrderController"(¦ÿ¶µ8„Οµ·1
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(¤ξξϋÿÿÿÿ8Φτα·1
+~	java:S116#"]Rename this field "FirstNameTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‡ξεόÿÿÿÿ8οτα·1
+}	java:S116%"\Rename this field "LastNameTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ςθ¬ ϋÿÿÿÿ8οτα·1
+	java:S116'"`Rename this field "EmailAddressTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ·‡‹ωÿÿÿÿ8οτα·1
+z	java:S116)"_Rename this field "PhoneNumberTextField" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ςώ38οτα·1
+}	java:S116-"\Rename this field "CreateOrderButton" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ϊσόÿÿÿÿ8³Ζµ·1
+‚	java:S116/"aRename this field "ProductInventoryButton" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•Δϋϋÿÿÿÿ8³Ζµ·1
+C
+java:S1170"!Make this final field static too.(ββ½ϊÿÿÿÿ8οτα·1
+
+java:S14502"dRemove the "createOrderController" field and declare it as a local variable in the relevant methods.(¦ÿ¶µ8μΝ‹µ·1
+n
+java:S1450"QRemove the "db" field and declare it as a local variable in the relevant methods.(’ω―8£Ρ΄·1
+
+java:S14501"]Remove the "mainController" field and declare it as a local variable in the relevant methods.(µΎυκύÿÿÿÿ8μΝ‹µ·1
+‚
+java:S14503"eRemove the "orderHistoryController" field and declare it as a local variable in the relevant methods.(©Ψ8μΝ‹µ·1
+‹
+java:S14504"iRemove the "productInventoryController" field and declare it as a local variable in the relevant methods.(ΖΥªώÿÿÿÿ8νΝ‹µ·1
+k	java:S100ψ"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψ±Φ8«ϋ¬µ·1
+C
+java:S1068"&Remove this unused "db" private field.(’ω―8ότα·1

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.duhakahya697637endassignment.Controller.CreateOrderController">
+    <children>
+        <GridPane prefHeight="600.0" prefWidth="204.0" styleClass="gridPane">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="80.0" minHeight="10.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="126.0" minHeight="10.0" prefHeight="66.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="129.0" minHeight="6.0" prefHeight="66.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="70.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="211.0" minHeight="10.0" prefHeight="195.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <Button fx:id="DashBoardButton" onAction="#onDashboardButtonClick" prefHeight="32.0" prefWidth="146.0" text="Dashboard" textAlignment="CENTER" GridPane.rowIndex="1">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="CreateOrderButton" onAction="#onCreateOrderButtonClick" prefHeight="33.0" prefWidth="145.0" text="Create order" GridPane.rowIndex="2">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="ProductInventoryButton" onAction="#onProductInventoryButtonClick" prefHeight="35.0" prefWidth="143.0" text="Product inventory" GridPane.rowIndex="3">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="OrderHistoryButton" onAction="#onOrderHistoryButtonClick" prefHeight="33.0" prefWidth="142.0" text="Order history" GridPane.rowIndex="4">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <GridPane.margin>
+                        <Insets left="30.0" />
+                    </GridPane.margin>
+                </Button>
+            </children>
+            <Button fx:id="LogOutButton" mnemonicParsing="false" onAction="#onLogoutButtonClick" prefHeight="33.0" prefWidth="142.0" text="Log out" GridPane.rowIndex="5">
+                <GridPane.margin>
+                    <Insets left="30.0" top="100.0" />
+                </GridPane.margin>
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+        </GridPane>
+
+        <Label layoutX="223.0" layoutY="61.0" text="Customer information" GridPane.columnIndex="1">
+            <font>
+                <Font size="14.0" />
+            </font>
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+            <GridPane.margin>
+                <Insets left="10.0" top="50.0" />
+            </GridPane.margin>
+        </Label>
+        <Label layoutX="223.0" layoutY="114.0" text="*First name:" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+        <TextField fx:id="FirstNameTextField" layoutX="351.0" layoutY="110.0" prefHeight="25.0" prefWidth="200.0" promptText="First name" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets left="100.0" right="80.0" />
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="LastNameTextField" layoutX="351.0" layoutY="146.0" prefHeight="25.0" prefWidth="200.0" promptText="Last name" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <GridPane.margin>
+                <Insets left="100.0" right="80.0" />
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="EmailAddressTextField" layoutX="351.0" layoutY="183.0" prefHeight="25.0" prefWidth="200.0" promptText="E-mail address" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <GridPane.margin>
+                <Insets left="100.0" right="80.0" />
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="PhoneNumberTextField" layoutX="351.0" layoutY="220.0" prefHeight="25.0" prefWidth="200.0" promptText="Phone number" GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <GridPane.margin>
+                <Insets left="100.0" right="80.0" />
+            </GridPane.margin>
+        </TextField>
+        <Label layoutX="224.0" layoutY="150.0" text="*Last name:" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+        <Label layoutX="223.0" layoutY="187.0" text="*E-mail address:" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+        <Label layoutX="223.0" layoutY="224.0" text="*Phone number:" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+        <Label layoutX="226.0" layoutY="273.0" text="Products" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <GridPane.margin>
+                <Insets bottom="220.0" left="10.0" />
+            </GridPane.margin>
+            <font>
+                <Font name="System Bold Italic" size="18.0" />
+            </font>
+        </Label>
+
+        <Button layoutX="211.0" layoutY="561.0" mnemonicParsing="false" onAction="#addProductButton" text="Add product" GridPane.columnIndex="1" GridPane.rowIndex="6">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Button>
+        <Button layoutX="320.0" layoutY="561.0" mnemonicParsing="false" onAction="#deleteProductButton" text="Delete product" GridPane.columnIndex="1" GridPane.rowIndex="6">
+            <GridPane.margin>
+                <Insets left="100.0" />
+            </GridPane.margin>
+        </Button>
+        <Button layoutX="442.0" layoutY="561.0" mnemonicParsing="false" onAction="#createOrderButton" text="Create order" GridPane.columnIndex="1" GridPane.rowIndex="6">
+            <GridPane.margin>
+                <Insets left="210.0" />
+            </GridPane.margin>
+        </Button>
+      <TableView fx:id="orderTableView" layoutX="220.0" layoutY="310.0" prefHeight="224.0" prefWidth="580.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+          <columns>
+              <TableColumn prefWidth="75.0" text="Quantity">
+                  <cellValueFactory>
+                      <PropertyValueFactory property="quantity" />
+                  </cellValueFactory>
+              </TableColumn>
+              <TableColumn prefWidth="200.0" text="Name">
+                  <cellValueFactory>
+                      <PropertyValueFactory property="name" />
+                  </cellValueFactory>
+              </TableColumn>
+              <TableColumn prefWidth="150.0" text="Category">
+                  <cellValueFactory>
+                      <PropertyValueFactory property="category" />
+                  </cellValueFactory>
+              </TableColumn>
+              <TableColumn prefWidth="100.0" text="Price">
+                  <cellValueFactory>
+                      <PropertyValueFactory property="price" />
+                  </cellValueFactory>
+              </TableColumn>
+          </columns>
+         <GridPane.margin>
+            <Insets left="10.0" right="20.0" top="30.0" />
+         </GridPane.margin>
+      </TableView>
+
+              <Label alignment="TOP_LEFT" layoutX="223.0" layoutY="28.0" text="Create Order">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Label>
+      <Label fx:id="errorLabel" layoutX="551.0" layoutY="560.0" prefHeight="27.0" prefWidth="253.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+
+        
+
+
+    </children>
+
+</AnchorPane>
