@@ -27,3 +27,15 @@ iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endass
 fDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Model/User.java,a\e\ae792ab356cea49935558bf25407cb4553b64d14
 ™
 iDuhaKahya-697637-end-assignment/src/main/java/com/example/duhakahya697637endassignment/Data/Database.java,d\c\dc234001b246adf81b8115afee14d2141d91c96b
+›
+kDuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/login-view.fxml,f\4\f4ffa2fa344728ee3b4ff7eaced3d580deb96192
+¢
+rDuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/orderHistory-view.fxml,8\f\8f471ae36b3ab4d99497bf3dac764afba3f7fcee
+¬
+|DuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/editProductToInventory-view.fxml,e\c\ec863c5724045900f571f00729bc170ed304725d
+¡
+qDuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/createOrder-view.fxml,7\3\7327ac95ca1d440377bc7a7c75900058ff90a2a6
+š
+jDuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/main-view.fxml,2\2\221617b279e9ebd40b4cbdc728aad482102337be
+¦
+vDuhaKahya-697637-end-assignment/src/main/resources/com/example/duhakahya697637endassignment/productInventory-view.fxml,d\6\d65c0f8a00f1d5129df4a4ddc129689086fe2a61
